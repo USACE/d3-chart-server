@@ -1,29 +1,18 @@
 import express from 'express';
-import dotenv from 'dotenv';
 
-import DamProfileChartRouter from './dam-profile-chart/router.js';
-import ExampleScatterRouter from './example-scatter/router.js';
-
-dotenv.config();
+import AppInfo from './appinfo.js';
+import DamProfileChart from './dam-profile-chart/handler.js';
+import ExampleScatter from './example-scatter/handler.js';
 
 const app = express();
 
 // Publish Information on all routes
-const routes = [{ url: '/dam-profile-chart' }, { url: '/example-scatter' }];
 app.get('/', (req, res) => {
-  res.send(
-    routes.map((r) => ({
-      ...r,
-      url: `${process.env.ROOT_URL}${r.url}`,
-    }))
-  );
+  res.send(AppInfo);
 });
 
 // Register Individual D3 Visualizations
-app.use('/dam-profile-chart', DamProfileChartRouter);
-app.use('/example-scatter', ExampleScatterRouter);
+app.get('/dam-profile-chart', DamProfileChart);
+app.get('/example-scatter', ExampleScatter);
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+export default app;

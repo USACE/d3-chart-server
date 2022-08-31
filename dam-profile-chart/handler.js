@@ -1,16 +1,7 @@
-import express from 'express';
 import DamProfileChart from './chart.js';
 import Info from './info.js';
 
-const router = express.Router();
-
-// Information Endpoint
-router.get('/', (req, res) => {
-  res.send(Info);
-});
-
-// Render D3 SVG
-router.get('/render', (req, res) => {
+export default (req, res) => {
   // Check for required numeric query parameters
   const missing =
     Info &&
@@ -30,6 +21,4 @@ router.get('/render', (req, res) => {
       outflow: outflow,
     }).serialize()
   );
-});
-
-export default router;
+};

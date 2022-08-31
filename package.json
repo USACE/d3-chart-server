@@ -1,15 +1,16 @@
 {
-  "name": "js-render-farm",
+  "name": "d3-chart-server",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "nodemon local.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
+    "@vendia/serverless-express": "^4.10.1",
     "d3": "^7.6.1",
     "d3-time": "^3.0.0",
     "dotenv": "^16.0.1",
