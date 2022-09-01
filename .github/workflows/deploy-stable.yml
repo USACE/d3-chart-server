@@ -2,7 +2,6 @@ name: stable-d3-chart-server.zip
 
 on:
   push:
-    branches: ['main']
     tags:
       - 'v*.*'
   workflow_dispatch:
@@ -12,12 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      # https://stackoverflow.com/questions/59874409/trigger-github-workflow-only-if-pushed-to-specific-branch-and-tag-exists
+
+      - name: Exit if not on main branch
+        if: endsWith(github.ref, 'main') == false
+        run: exit -1
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.CASTLECI_STABLE_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.CASTLECI_STABLE_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.CASTLECI_STABLE_AWS_REGION }}
+
       - name: Create .zip and Upload to S3
         env:
           S3_BUCKET: ${{ secrets.CASTLECI_STABLE_S3_BUCKET_LAMBDA_ZIPS }}
