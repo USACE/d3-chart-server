@@ -29,5 +29,6 @@ jobs:
           S3_BUCKET: ${{ secrets.CASTLECI_STABLE_S3_BUCKET_LAMBDA_ZIPS }}
           ZIPFILE: stable-d3-chart-server.zip
         run: |
-          zip -j ${ZIPFILE} ${GITHUB_WORKSPACE} --exclude .env
-          aws s3 cp ${ZIPFILE} s3://${S3_BUCKET}/${ZIPFILE}
+          cd ${GITHUB_WORKSPACE}
+          zip -r ../${ZIPFILE} . --exclude .env
+          aws s3 cp ../${ZIPFILE} s3://${S3_BUCKET}/${ZIPFILE}
