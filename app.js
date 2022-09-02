@@ -11,6 +11,11 @@ app.get('/', (req, res) => {
   res.send(AppInfo);
 });
 
+// Health Checks
+app.get('/health', (req, res) => {
+  res.send('healthy');
+});
+
 // Register Individual D3 Visualizations
 app.get('/dam-profile-chart', DamProfileChart);
 app.get('/example-scatter', ExampleScatter);
