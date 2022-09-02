@@ -10,9 +10,11 @@ jobs:
     name: Lambda Zip
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
       # https://stackoverflow.com/questions/59874409/trigger-github-workflow-only-if-pushed-to-specific-branch-and-tag-exists
-
       - name: Exit if not on main branch
         if: endsWith(github.ref, 'main') == false
         run: exit -1
@@ -30,5 +32,6 @@ jobs:
           ZIPFILE: stable-d3-chart-server.zip
         run: |
           cd ${GITHUB_WORKSPACE}
+          npm install --omit=dev
           zip -r ../${ZIPFILE} . --exclude .env
           aws s3 cp ../${ZIPFILE} s3://${S3_BUCKET}/${ZIPFILE}
