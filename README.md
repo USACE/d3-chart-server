@@ -6,8 +6,11 @@ Each visualization should be packaged inside a dedicated folder at the root of t
 
 - Handler function to be called on `GET /<name-of-visualization>`. This function will have the form:
 
-  ```(req, res) => {
-          ...
+  ```
+  (req, res) => {
+        //
+        // additional code here
+        //
         res.send(...)
     };
   ```
