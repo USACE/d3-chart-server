@@ -9,7 +9,7 @@ jobs:
   StableDeploy:
     name: Lambda Zip
     runs-on: ubuntu-latest
-    if: $(git branch --contains ${{ github.ref }})
+    if: $(git branch -r --contains ${{ github.ref }})
     steps:
       - uses: actions/checkout@v3
       # - uses: actions/setup-node@v3
