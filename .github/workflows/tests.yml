@@ -1,4 +1,4 @@
-name: tests
+name: Build and Test
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: ['main']
 jobs:
-  tests:
+  Tests:
     name: tests
     runs-on: ubuntu-latest
     steps:
@@ -20,5 +20,5 @@ jobs:
         run: |
           cd ${GITHUB_WORKSPACE}
           npm install --omit=dev
-      - name: tests
+      - name: Run Tests
         run: echo "TESTS NOT YET IMPLEMENTED"
