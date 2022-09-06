@@ -1,13 +1,17 @@
-name: develop-d3-chart-server.zip
+name: d3-chart-server.zip
 
 on:
   push:
     branches: ['main']
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
 jobs:
-  DockerImage:
-    name: Lambda Zip
+  BuildAndDeploy:
+    name: Deploy Lambda Zip
     runs-on: ubuntu-latest
+    env:
+      ZIPFILE: d3-chart-server.zip
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -19,12 +23,20 @@ jobs:
           aws-access-key-id: ${{ secrets.CASTLECI_DEVELOP_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.CASTLECI_DEVELOP_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.CASTLECI_DEVELOP_AWS_REGION }}
-      - name: Create .zip and Upload to S3
+      - name: Zip Deploy Package
         env:
           S3_BUCKET: ${{ secrets.CASTLECI_DEVELOP_S3_BUCKET_LAMBDA_ZIPS }}
-          ZIPFILE: develop-d3-chart-server.zip
         run: |
           cd ${GITHUB_WORKSPACE}
           npm install --omit=dev
           zip -r ../${ZIPFILE} . --exclude .env
-          aws s3 cp ../${ZIPFILE} s3://${S3_BUCKET}/${ZIPFILE}
+      - name: Deploy Develop
+        if: github.ref_type == branch
+        env:
+          S3_BUCKET: ${{ secrets.CASTLECI_DEVELOP_S3_BUCKET_LAMBDA_ZIPS }}
+        run: aws s3 cp ${ZIPFILE} s3://${S3_BUCKET}/develop-${ZIPFILE}
+      - name: Deploy Stable
+        if: github.ref_type == tag
+        env:
+          S3_BUCKET: ${{ secrets.CASTLECI_DEVELOP_S3_BUCKET_LAMBDA_ZIPS }}
+        run: aws s3 cp ${ZIPFILE} s3://${S3_BUCKET}/stable-${ZIPFILE}
