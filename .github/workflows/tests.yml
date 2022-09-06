@@ -1,0 +1,24 @@
+name: tests
+
+on:
+  push:
+    branches: ['main']
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: ['main']
+jobs:
+  Tests:
+    name: Install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          npm install --omit=dev
+      - name: Tests
+        run: echo "TESTS NOT IMPLEMENTED"
