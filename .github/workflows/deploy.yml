@@ -31,12 +31,12 @@ jobs:
           npm install --omit=dev
           zip -r ../${ZIPFILE} . --exclude .env
       - name: Deploy Develop
-        if: github.ref_type == branch
+        if: github.ref_type == 'branch'
         env:
           S3_BUCKET: ${{ secrets.CASTLECI_DEVELOP_S3_BUCKET_LAMBDA_ZIPS }}
         run: aws s3 cp ${ZIPFILE} s3://${S3_BUCKET}/develop-${ZIPFILE}
       - name: Deploy Stable
-        if: github.ref_type == tag
+        if: github.ref_type == 'tag'
         env:
           S3_BUCKET: ${{ secrets.CASTLECI_DEVELOP_S3_BUCKET_LAMBDA_ZIPS }}
         run: aws s3 cp ${ZIPFILE} s3://${S3_BUCKET}/stable-${ZIPFILE}
