@@ -20,5 +20,5 @@ jobs:
         run: |
           cd ${GITHUB_WORKSPACE}
           npm install --omit=dev
-      - name: Tests
+      - name: tests
         run: echo "TESTS NOT YET IMPLEMENTED"
