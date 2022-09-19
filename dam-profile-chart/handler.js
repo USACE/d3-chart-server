@@ -12,13 +12,28 @@ export default (req, res) => {
     return;
   }
 
-  const { pool, tail, inflow, outflow } = req.query;
+  const {
+    pool,
+    tail,
+    inflow,
+    outflow,
+    surcharge,
+    damBottom,
+    damTop,
+    gradientTop,
+    gradientBottom,
+  } = req.query;
   res.send(
     DamProfileChart({
       pool: pool,
       tail: tail,
       inflow: inflow,
       outflow: outflow,
+      surcharge: surcharge,
+      damBottom: damBottom,
+      damTop: damTop,
+      gradientBottom: gradientBottom,
+      gradientTop: gradientTop,
     }).serialize()
   );
 };
