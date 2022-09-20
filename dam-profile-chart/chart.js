@@ -1,8 +1,34 @@
 import { JSDOM } from 'jsdom';
 import * as d3 from 'd3';
 
+import Dam from './elements/Dam.js';
+import Gradient from './elements/Gradient.js';
+import InflowIcon from './elements/InflowIcon.js';
+import LeftAxis from './elements/LeftAxis.js';
+import Legend from './elements/Legend.js';
+import Mountain from './elements/Mountain.js';
+import OutflowIcon from './elements/OutflowIcon.js';
+import SurchargeIcon from './elements/SurchargeIcon.js';
+import WaterLevel from './elements/WaterLevel.js';
+import TailwaterLevel from './elements/TailwaterLevel.js';
+import Levels from './elements/Levels.js';
+import Info from './elements/Info.js';
+
 export default function DamProfileChart(info) {
-  const { pool, tail, inflow, outflow } = info;
+  const {
+    pool,
+    tail,
+    inflow,
+    outflow,
+    surcharge,
+    damBottom,
+    damTop,
+    height = undefined,
+    gradientBottom,
+    gradientTop,
+    browser,
+    levels,
+  } = info;
 
   //////////////////////
   // Approximate the DOM
@@ -40,82 +66,113 @@ export default function DamProfileChart(info) {
   ////////////
   // D3 SCRIPT
   ////////////
-  // 2. Use the margin convention practice
-  var margin = { top: 50, right: 50, bottom: 50, left: 50 },
-    width = window.innerWidth - margin.left - margin.right, // Use the window's width
-    height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
 
-  // The number of datapoints
-  var n = pool;
+  var margin = { top: 50, right: 50, bottom: 50, left: 50 };
+  // var width = window.innerWidth - margin.left - margin.right; // Use the window's width
+  // var height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
+  var cWidth = 1240;
+  var cHeight = 650;
 
-  // 5. X scale will use the index of our data
-  var xScale = d3
+  // Dam Scale
+  const damScale = d3
     .scaleLinear()
-    .domain([0, n - 1]) // input
-    .range([0, width]); // output
+    .domain([damTop, damBottom])
+    .range([130, 560]);
 
-  // 6. Y scale will use the randomly generate number
-  var yScale = d3
-    .scaleLinear()
-    .domain([0, 1]) // input
-    .range([height, 0]); // output
-
-  // 7. d3's line generator
-  var line = d3
-    .line()
-    .x(function (d, i) {
-      return xScale(i);
-    }) // set the x values for the line generator
-    .y(function (d) {
-      return yScale(d.y);
-    }) // set the y values for the line generator
-    .curve(d3.curveMonotoneX); // apply smoothing to the line
-
-  // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-  var dataset = d3.range(n).map(function (d) {
-    return { y: d3.randomUniform(1)() };
-  });
-
-  // 1. Add the SVG to the page and employ #2
+  // Build SVG; Add to Chart
   var svg = d3
     .select(body)
+    .append('div')
+    .classed('svg-container', true)
     .append('svg')
-    .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    .attr('preserveAspectRatio', 'xMinYMin meet')
+    .attr('viewBox', '0 0 ' + cWidth + ' ' + cHeight);
 
-  // 3. Call the x axis in a group tag
-  svg
-    .append('g')
-    .attr('class', 'x axis')
-    .attr('transform', 'translate(0,' + height + ')')
-    .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
+  // @todo; see if this is necessary
+  if (height !== undefined) {
+    svg.attr('height', height);
+  }
 
-  // 4. Call the y axis in a group tag
-  svg.append('g').attr('class', 'y axis').call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
+  // Handle IE
+  if (browser && browser.toUpperCase() === 'IE') {
+    svg.attr('style', 'min-height: 650px');
+  }
 
-  // 9. Append the path, bind the data, and call the line generator
-  svg
-    .append('path')
-    .datum(dataset) // 10. Binds data to the line
-    .attr('class', 'line') // Assign a class for styling
-    .attr('d', line); // 11. Calls the line generator
+  svg.append('g').classed('svg-content-responsive', true);
+  svg.append('defs');
 
-  // 12. Appends a circle for each datapoint
-  svg
-    .selectAll('.dot')
-    .data(dataset)
-    .enter()
-    .append('circle') // Uses the enter().append() method
-    .attr('class', 'dot') // Assign a class for styling
-    .attr('cx', function (d, i) {
-      return xScale(i);
-    })
-    .attr('cy', function (d) {
-      return yScale(d.y);
-    })
-    .attr('r', 5);
+  //////////////////////////
+  // create line on the left
+  // replaces drawTicks()
+  //////////////////////////
+  LeftAxis(svg, damTop, damBottom);
+
+  ////////////////////////////
+  // Draw Water Level
+  // replaces drawWaterLevel()
+  ////////////////////////////
+  WaterLevel(svg, damScale, pool);
+  TailwaterLevel(svg, damScale, tail);
+
+  //////////////////////////
+  // create center dam
+  // Also includes code
+  // previously in noLock()
+  //////////////////////////
+  Dam(svg);
+
+  ////////////////////////////
+  // Create Legend
+  // replaces createLegend
+  ////////////////////////////
+  Legend(svg);
+
+  ////////////////////////////
+  // Icons
+  ////////////////////////////
+  InflowIcon(svg, inflow);
+  OutflowIcon(svg, outflow, { x: 600, y: 360 });
+  SurchargeIcon(svg, surcharge);
+
+  ////////////////////////////
+  // Draw Mountain
+  // replaces drawMountain
+  ////////////////////////////
+  Mountain(svg);
+
+  // @todo
+  // need to abstract this concept into multiple visualizations
+  // if (options.hasLock) {
+  //   createLock();
+  //   drawBoat();
+  // } else {
+  //   if (options.hasTurbine) {
+  //     noLockTurbine();
+  //   } else {
+  //     noLock();
+  //   }
+  // }
+
+  // @todo refactor turbine logic
+  // if (options.hasTurbine) {
+  //   createTurbine();
+  // }
+
+  //////////////////////////////////////
+  // Middle Gradient
+  // replaces createMiddleGradient(mode)
+  // @todo; Get this working
+  // @todo; Confirm desired behavior of
+  //        drawn gradient scale
+  //        (red, yellow, green)
+  //////////////////////////////////////
+  if (!isNaN(gradientBottom) && !isNaN(gradientTop)) {
+    Gradient(svg, damScale, gradientBottom, gradientTop);
+  }
+
+  Levels(svg, damScale, damTop, damBottom, levels);
+
+  Info(svg);
 
   return dom;
 }
