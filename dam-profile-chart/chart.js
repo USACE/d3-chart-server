@@ -27,6 +27,7 @@ export default function DamProfileChart(info) {
     gradientBottom,
     gradientTop,
     browser,
+    levels,
   } = info;
 
   //////////////////////
@@ -169,11 +170,7 @@ export default function DamProfileChart(info) {
     Gradient(svg, damScale, gradientBottom, gradientTop);
   }
 
-  Levels(svg, damScale, damTop, damBottom, [
-    { name: 'conservation', value: 4.5 },
-    { name: 'top-of-flood', value: 15.0 },
-    { name: 'flood-control', value: 12.5 },
-  ]);
+  Levels(svg, damScale, damTop, damBottom, levels);
 
   Info(svg);
 

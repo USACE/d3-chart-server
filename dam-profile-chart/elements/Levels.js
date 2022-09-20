@@ -1,6 +1,11 @@
 import { createLine, straightLine } from './Lines.js';
 
 const Levels = (svg, damScale, damTop, damBottom, levels = []) => {
+  // short circuit
+  if (!levels.length) {
+    return;
+  }
+
   const x = { left: 160, right: 410 };
   const length = 290;
   const radius = 4;
