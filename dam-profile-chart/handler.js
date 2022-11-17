@@ -6,7 +6,8 @@ export default (req, res) => {
   const missing =
     Info &&
     Info.required_params &&
-    Info.required_params.find((r) => isNaN(req.query[r]));
+    Info.required_params.find((r) => isNaN(req.query[r.toLowerCase()]));
+
   if (missing) {
     res
       .status(400)
@@ -14,16 +15,19 @@ export default (req, res) => {
     return;
   }
 
+  // note; query parameters all returned as lowercase keys
+  // case switched in destructure to avoid changing additiional code
+  // and variables in function DamProfileChart
   const {
     pool,
     tail,
     inflow,
     outflow,
     surcharge,
-    damBottom,
-    damTop,
-    gradientBottom,
-    gradientTop,
+    dambottom: damBottom,
+    damtop: damTop,
+    gradientbottom: gradientBottom,
+    gradienttop: gradientTop,
     level = [],
   } = req.query;
 

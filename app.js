@@ -6,6 +6,16 @@ import ExampleScatter from './example-scatter/handler.js';
 
 const app = express();
 
+// Lowercase all querystring parameters
+// https://stackoverflow.com/questions/15521876/nodejs-express-is-it-possible-to-have-case-insensitive-querystring
+app.use((req, res, next) => {
+  for (var key in req.query)
+  { 
+    req.query[key.toLowerCase()] = req.query[key];
+  }
+  next();
+});
+
 // Publish Information on all routes
 app.get('/', (req, res) => {
   res.send(AppInfo);
