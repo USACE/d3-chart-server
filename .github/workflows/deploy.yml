@@ -17,26 +17,43 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Configure AWS credentials
+
+      - name: Zip Deploy Package
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          npm install --omit=dev
+          zip -r ../${ZIPFILE} . --exclude .env
+
+      ##########################################
+      # DEPLOY TO DEVELOP ON COMMITS to 'main'
+      ##########################################
+      - name: Configure AWS Credentials Develop
+        if: github.ref_type == 'branch'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.CASTLECI_DEVELOP_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.CASTLECI_DEVELOP_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.CASTLECI_DEVELOP_AWS_REGION }}
-      - name: Zip Deploy Package
-        env:
-          S3_BUCKET: ${{ secrets.CASTLECI_DEVELOP_S3_BUCKET_LAMBDA_ZIPS }}
-        run: |
-          cd ${GITHUB_WORKSPACE}
-          npm install --omit=dev
-          zip -r ../${ZIPFILE} . --exclude .env
+
       - name: Deploy Develop
         if: github.ref_type == 'branch'
         env:
           S3_BUCKET: ${{ secrets.CASTLECI_DEVELOP_S3_BUCKET_LAMBDA_ZIPS }}
         run: aws s3 cp ../${ZIPFILE} s3://${S3_BUCKET}/develop-${ZIPFILE}
+
+      ##########################################
+      # DEPLOY TO STABLE ON TAGS MATCHING v*.*.*
+      ##########################################
+      - name: Configure AWS Credentials Stable
+        if: github.ref_type == 'tag'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.CASTLECI_STABLE_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.CASTLECI_STABLE_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.CASTLECI_STABLE_AWS_REGION }}
+
       - name: Deploy Stable
         if: github.ref_type == 'tag'
         env:
-          S3_BUCKET: ${{ secrets.CASTLECI_DEVELOP_S3_BUCKET_LAMBDA_ZIPS }}
+          S3_BUCKET: ${{ secrets.CASTLECI_STABLE_S3_BUCKET_LAMBDA_ZIPS }}
         run: aws s3 cp ../${ZIPFILE} s3://${S3_BUCKET}/stable-${ZIPFILE}
