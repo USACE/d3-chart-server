@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 
-import DamProfileChartInfo from './dam-profile-chart/info.js';
-import ExampleScatterInfo from './example-scatter/info.js';
+import {INFO as DamProfileChartInfo} from './handlers/dam-profile-chart.js';
+import {INFO as ExampleScatterInfo} from './handlers/example-scatter.js';
 
 dotenv.config();
 const ROOT_URL = process.env.ROOT_URL;

@@ -1,5 +1,3 @@
-import * as d3 from 'd3';
-
 const Info = (svg, text) => {
   svg.append('g').attr('class', 'dam');
   svg

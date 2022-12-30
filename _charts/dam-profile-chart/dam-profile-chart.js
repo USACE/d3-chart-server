@@ -1,4 +1,3 @@
-import { JSDOM } from 'jsdom';
 import * as d3 from 'd3';
 
 import Dam from './elements/Dam.js';
@@ -14,15 +13,15 @@ import TailwaterLevel from './elements/TailwaterLevel.js';
 import Levels from './elements/Levels.js';
 import Info from './elements/Info.js';
 
-export default function DamProfileChart(info) {
+export default function DamProfileChart(info, dom) {
   const {
     pool,
     tail,
     inflow,
     outflow,
     surcharge,
-    damBottom,
-    damTop,
+    dambottom,
+    damtop,
     height = undefined,
     gradientBottom,
     gradientTop,
@@ -30,63 +29,27 @@ export default function DamProfileChart(info) {
     levels,
   } = info;
 
-  //////////////////////
-  // Approximate the DOM
-  //////////////////////
-  const dom = new JSDOM(
-    `<!DOCTYPE html>
-    <meta charset="utf-8">
-    
-    <style type="text/css">
-    /* 13. Basic Styling with CSS */
-    
-    /* Style the lines by removing the fill and applying a stroke */
-    .line {
-        fill: none;
-        stroke: #ffab00;
-        stroke-width: 3;
-    }
-    
-    /* Style the dots by assigning a fill and stroke */
-    .dot {
-        fill: #ffab00;
-        stroke: #fff;
-    }
-    
-    </style>
-    <!-- Body tag is where we will append our SVG and SVG objects-->
-    <body>
-    <text>${JSON.stringify(info)}</text>
-    </body>`
-  );
-
-  const window = dom.window;
-  const body = window.document.body;
-
   ////////////
   // D3 SCRIPT
   ////////////
 
-  var margin = { top: 50, right: 50, bottom: 50, left: 50 };
+  // var margin = { top: 50, right: 50, bottom: 50, left: 50 };
   // var width = window.innerWidth - margin.left - margin.right; // Use the window's width
   // var height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
-  var cWidth = 1240;
-  var cHeight = 650;
+  // var cWidth = 1240;
+  // var cHeight = 650;
 
   // Dam Scale
   const damScale = d3
     .scaleLinear()
-    .domain([damTop, damBottom])
+    .domain([damtop, dambottom])
     .range([130, 560]);
 
   // Build SVG; Add to Chart
-  var svg = d3
-    .select(body)
-    .append('div')
-    .classed('svg-container', true)
-    .append('svg')
-    .attr('preserveAspectRatio', 'xMinYMin meet')
-    .attr('viewBox', '0 0 ' + cWidth + ' ' + cHeight);
+  var svg = d3.select(dom);
+
+  // Clear any InnerHTML in the case that this function has already run against the provided dom
+  svg.selectChildren().remove();
 
   // @todo; see if this is necessary
   if (height !== undefined) {
@@ -105,7 +68,7 @@ export default function DamProfileChart(info) {
   // create line on the left
   // replaces drawTicks()
   //////////////////////////
-  LeftAxis(svg, damTop, damBottom);
+  LeftAxis(svg, damtop, dambottom);
 
   ////////////////////////////
   // Draw Water Level
@@ -170,9 +133,7 @@ export default function DamProfileChart(info) {
     Gradient(svg, damScale, gradientBottom, gradientTop);
   }
 
-  Levels(svg, damScale, damTop, damBottom, levels);
+  Levels(svg, damScale, damtop, dambottom, levels);
 
   Info(svg);
-
-  return dom;
 }

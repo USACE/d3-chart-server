@@ -34,7 +34,7 @@ const Levels = (svg, damScale, damTop, damBottom, levels = []) => {
     priorSide = 'left';
   lineData.forEach((d) => {
     if (
-      priorVal == -1 ||
+      priorVal === -1 ||
       priorVal - d.value > baseModifier ||
       priorSide !== d.side
     ) {
@@ -68,7 +68,7 @@ const Levels = (svg, damScale, damTop, damBottom, levels = []) => {
   lines
     .append('path')
     .attr('d', (d) => {
-      if (d.lineType == 'straight') {
+      if (d.lineType === 'straight') {
         return d.showLine ? createLine(length) : createLine(20);
       } else {
         return d.showLine
@@ -111,7 +111,7 @@ const Levels = (svg, damScale, damTop, damBottom, levels = []) => {
     .attr('y', (d) => damScale(d.value) + d.modifier + radius - 6.5)
     .attr('font-family', 'sans-serif')
     .attr('fill', '#FF0000')
-    .attr('font-size', '1em')
+    .attr('font-size', '0.8em')
     .text((d) => d.name);
 
   lines
@@ -120,9 +120,9 @@ const Levels = (svg, damScale, damTop, damBottom, levels = []) => {
     .attr('x', (d) =>
       d.side === 'left' ? x[d.side] - 10 : x[d.side] + length + 10
     )
-    .attr('y', (d) => damScale(d.value) + d.modifier + radius + 6.5)
+    .attr('y', (d) => damScale(d.value) + d.modifier + radius + 16)
     .attr('font-family', 'sans-serif')
-    .attr('fill', '#000000')
+    .attr('fill', '#FF0000')
     .attr('font-size', '1em')
     .text((d) => `${d.value}'`);
 };
