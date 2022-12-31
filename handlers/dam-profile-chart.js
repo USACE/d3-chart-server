@@ -1,12 +1,18 @@
-import DamProfileChart from './chart.js';
-import Info from './info.js';
+import { JSDOM } from 'jsdom';
+import DamProfileChart from '../_charts/dam-profile-chart/dam-profile-chart.js';
 
-export default (req, res) => {
+const INFO = {
+  name: 'Dam Profile Chart',
+  description: `Dam Profile Chart Description`,
+  required_params: ['pool', 'tail', 'inflow', 'outflow', 'damTop', 'damBottom'],
+};
+
+const handler = (req, res) => {
   // Check for required numeric query parameters
   const missing =
-    Info &&
-    Info.required_params &&
-    Info.required_params.find((r) => isNaN(req.query[r.toLowerCase()]));
+    INFO &&
+    INFO.required_params &&
+    INFO.required_params.find((r) => isNaN(req.query[r.toLowerCase()]));
 
   if (missing) {
     res
@@ -24,10 +30,10 @@ export default (req, res) => {
     inflow,
     outflow,
     surcharge,
-    dambottom: damBottom,
-    damtop: damTop,
-    gradientbottom: gradientBottom,
-    gradienttop: gradientTop,
+    dambottom,
+    damtop,
+    gradientbottom,
+    gradienttop,
     level = [],
   } = req.query;
 
@@ -40,18 +46,32 @@ export default (req, res) => {
     }
   });
 
-  res.send(
-    DamProfileChart({
+  //////////////////////
+  // Approximate the DOM
+  //////////////////////
+  const { document } = new JSDOM(
+    `<svg preserveAspectRatio='xMinYMin meet' viewBox='0 0 1240 650'></svg>`
+  ).window;
+
+  const dom = document.querySelector('svg');
+
+  DamProfileChart(
+    {
       pool: pool,
       tail: tail,
       inflow: inflow,
       outflow: outflow,
       surcharge: surcharge,
-      damBottom: damBottom,
-      damTop: damTop,
-      gradientBottom: gradientBottom,
-      gradientTop: gradientTop,
+      dambottom: dambottom,
+      damtop: damtop,
+      gradientBottom: gradientbottom,
+      gradientTop: gradienttop,
       levels: validLevels,
-    }).serialize()
+    },
+    dom
   );
+
+  res.send(dom.outerHTML);
 };
+
+export { INFO, handler, handler as default };

@@ -1,8 +1,8 @@
 import express from 'express';
 
 import AppInfo from './appinfo.js';
-import DamProfileChart from './dam-profile-chart/handler.js';
-import ExampleScatter from './example-scatter/handler.js';
+import HandleDamProfileChart from './handlers/dam-profile-chart.js';
+import HandleExampleScatter from './handlers/example-scatter.js';
 
 const app = express();
 
@@ -27,7 +27,7 @@ app.get('/health', (req, res) => {
 });
 
 // Register Individual D3 Visualizations
-app.get('/dam-profile-chart', DamProfileChart);
-app.get('/example-scatter', ExampleScatter);
+app.get('/dam-profile-chart', HandleDamProfileChart);
+app.get('/example-scatter', HandleExampleScatter);
 
 export default app;

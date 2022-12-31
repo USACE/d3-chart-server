@@ -8,10 +8,12 @@ const TailwaterLevel = (svg, damScale, tailwater) => {
     .attr(
       'd',
       straightLine([
-        [490, damScale(tailwater)],
+        // [490, damScale(tailwater)], // this scales tailwater to actual elevation
+        [490, 530],
         [490, 590],
         [1210, 590],
-        [1210, damScale(tailwater)],
+        // [1210, damScale(tailwater)], // this scales tailwater to actual elevation
+        [1210, 530],
       ])
     )
     .attr('fill', '#85BBDF');
@@ -22,7 +24,8 @@ const TailwaterLevel = (svg, damScale, tailwater) => {
     .append('text')
     .attr('text-anchor', 'end')
     .attr('dx', 1200)
-    .attr('dy', damScale(tailwater) + 20)
+    // .attr('dy', damScale(tailwater) + 20) // labels tailwater above scaled elevation
+    .attr('dy', 530 + 20)
     .attr('fill', '#fff')
     .attr('class', 'tailwaterText')
     .attr('font-family', 'sans-serif')
