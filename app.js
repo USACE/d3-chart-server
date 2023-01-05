@@ -1,8 +1,13 @@
 import express from 'express';
+import dotenv from 'dotenv';
 
 import AppInfo from './appinfo.js';
 import HandleDamProfileChart from './handlers/dam-profile-chart.js';
 import HandleExampleScatter from './handlers/example-scatter.js';
+
+dotenv.config();
+
+const port = process.env.PORT || 3000;
 
 const app = express();
 
@@ -35,4 +40,6 @@ app.get('/health', (req, res) => {
 app.get('/dam-profile-chart', HandleDamProfileChart);
 app.get('/example-scatter', HandleExampleScatter);
 
-export default app;
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
